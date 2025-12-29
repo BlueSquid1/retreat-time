@@ -1,4 +1,6 @@
-app
-build.sh
-.gradle
-.kotlin
+# exclude everything except for gradle build files
+*
+!**/*.gradle.kts
+!gradle.properties
+!gradlew
+!gradle/

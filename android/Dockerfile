@@ -17,6 +17,8 @@ RUN sdkmanager "build-tools;36.0.0" "platforms;android-36"
 
 WORKDIR /android
 COPY . .
-RUN ./gradlew --no-daemon tasks
-ENTRYPOINT ["./gradlew", "--no-daemon"]
+
+# Cache the plugins needed to build the apk
+RUN ./gradlew --no-daemon --build-cache --configuration-cache assemble || true
+ENTRYPOINT ["./gradlew", "--no-daemon", "--no-rebuild", "--offline"]
 #CMD ["/bin/sh"]

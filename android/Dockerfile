@@ -16,9 +16,10 @@ RUN yes | sdkmanager --licenses
 RUN sdkmanager "build-tools;36.0.0" "platforms;android-36"
 
 WORKDIR /android
-COPY . .
+COPY ./gradlew ./gradle.properties ./settings.gradle.kts ./build.gradle.kts ./app/build.gradle.kts /android/
+COPY ./gradle/ /android/gradle/
 
-# Cache the plugins needed to build the apk
+# Cache the plugins needed to build the apk by attempting a build without any source code
 RUN ./gradlew --no-daemon --build-cache --configuration-cache assemble || true
 ENTRYPOINT ["./gradlew", "--no-daemon", "--no-rebuild", "--offline"]
 #CMD ["/bin/sh"]

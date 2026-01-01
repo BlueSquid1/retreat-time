@@ -1,0 +1,8 @@
+FROM node:22.21-alpine
+WORKDIR /frontend
+COPY package.json package-lock.json ./
+RUN npm install
+# COPY . .
+# RUN npm run build
+ENTRYPOINT ["npm", "run"]
+#CMD ["/bin/sh"]

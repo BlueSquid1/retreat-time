@@ -1,4 +1,4 @@
-FROM gradle:8.13-jdk21-noble AS buildenv
+FROM gradle:8.13-jdk21-noble AS build
 
 RUN apt update && apt install -y curl unzip
 
@@ -16,10 +16,12 @@ RUN yes | sdkmanager --licenses
 RUN sdkmanager "build-tools;36.0.0" "platforms;android-36"
 
 WORKDIR /android
-COPY ./gradlew ./gradle.properties ./settings.gradle.kts ./build.gradle.kts ./app/build.gradle.kts /android/
-COPY ./gradle/ /android/gradle/
 
-# Cache the plugins needed to build the apk by attempting a build without any source code
+# Cache all plugins by do a build with just the gradle config files and no kotlin source code.
+COPY ./gradlew ./gradle.properties ./settings.gradle.kts ./build.gradle.kts ./app/build.gradle.kts ./
+COPY ./gradle/ ./gradle/
+# build will fail because no kotlin source code but it will cache dependencies before crashing.
 RUN ./gradlew --no-daemon --build-cache --configuration-cache assemble || true
+
+COPY . .
 ENTRYPOINT ["./gradlew", "--no-daemon", "--no-rebuild", "--offline"]
-#CMD ["/bin/sh"]

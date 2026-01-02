@@ -35,9 +35,14 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+        allWarningsAsErrors = true
     }
     buildFeatures {
         compose = true
+    }
+    lint {
+        warningsAsErrors = true
+        abortOnError = true
     }
 }
 

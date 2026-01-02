@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "setup": "npm install --package-lock-only",
-    "build": "parcel build src/index.html --dist-dir /dist"
+    "build": "parcel build src/index.html --public-url ./ --dist-dir /dist"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",

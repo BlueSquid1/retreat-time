@@ -17,6 +17,12 @@ class MainActivity : ComponentActivity() {
         webView.layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
         webView.webViewClient = WebViewClient()
 
+        webView.settings.javaScriptEnabled = true
+        webView.settings.allowFileAccess = true
+        webView.settings.allowFileAccessFromFileURLs = true
+        webView.settings.allowUniversalAccessFromFileURLs = true
+
+
         // Load local HTML file
         webView.loadUrl("file:///android_asset/index.html")
         setContentView(webView)

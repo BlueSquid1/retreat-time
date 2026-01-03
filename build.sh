@@ -3,9 +3,9 @@ set -e
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+# Handle arguements
 VERBOSE=false
 if [[ "$*" == *"-v"* ]]; then
-    # if ran with -v then print out all logs
     VERBOSE=true
 fi
 
@@ -74,7 +74,7 @@ android() {
 
 build_frontend() {
     echo "Update npm packages"
-    run_quiet npm run --prefix frontend setup
+    run_quiet npm run --prefix frontend update_packages
 
     echo "Build frontend docker image"
     run_quiet docker build --tag "frontend" "${SCRIPT_DIR}/frontend"
@@ -86,7 +86,8 @@ build_frontend() {
 }
 
 run_frontend() {
-    python3 -m http.server -d ./build/frontend/ 8000
+    echo "serving on: http://localhost:8000"
+    run_quiet python3 -m http.server -d ./build/frontend/ 8000
 }
 
 frontend() {
@@ -98,6 +99,11 @@ build() {
     mkdir -p "${SCRIPT_DIR}/build"
     build_frontend
     build_android
+}
+
+setup_dev() {
+    echo "Install Node packages for frontend"
+    run_quiet npm run --prefix frontend setup
 }
 
 clean() {

@@ -2,7 +2,8 @@
   "name": "frontend",
   "version": "1.0.0",
   "scripts": {
-    "setup": "npm install --package-lock-only",
+    "setup": "npm install",
+    "update_packages": "npm install --package-lock-only",
     "build": "parcel build src/index.html --public-url ./ --dist-dir /dist"
   },
   "dependencies": {

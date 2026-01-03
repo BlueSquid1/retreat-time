@@ -54,6 +54,8 @@ run_android() {
         echo "avd is not detected. Starting it up"
         run_quiet /opt/homebrew/share/android-commandlinetools/emulator/emulator -avd myEmu &
     fi
+    echo "wait for emulator to respond"
+    adb wait-for-device
     echo "uninstall old android app"
     run_quiet adb uninstall com.example.retreattime
     echo "install new android app"

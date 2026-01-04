@@ -23,6 +23,9 @@ run_quiet() {
 }
 
 build_android() {
+    echo "cleaning from previous android build"
+    rm -rf "${SCRIPT_DIR}/build/android"
+
     echo "build android docker image"
     # as of 2026, google still do not release the AAPT2 tool (which is part of the android commandline tools) on 
     # linux for the arm64 platform so need to use the amd64 linux image :(
@@ -73,13 +76,16 @@ android() {
 }
 
 build_frontend() {
-    echo "Update npm packages"
+    echo "cleaning from previous frontend build"
+    rm -rf "${SCRIPT_DIR}/build/frontend"
+
+    echo "update npm packages"
     run_quiet npm run --prefix frontend update_packages
 
-    echo "Build frontend docker image"
+    echo "build frontend docker image"
     run_quiet docker build --tag "frontend" "${SCRIPT_DIR}/frontend"
     
-    echo "Compile frontend"
+    echo "compile frontend"
     run_quiet docker run --rm --tty --name "frontend_container" \
         -v "${SCRIPT_DIR}/build/frontend:/dist" \
         frontend build
@@ -102,12 +108,12 @@ build() {
 }
 
 setup_dev() {
-    echo "Install Node packages for frontend"
+    echo "install Node packages for frontend"
     run_quiet npm run --prefix frontend setup
 }
 
 clean() {
-    rm -f ./build
+    rm -rf "${SCRIPT_DIR}/build"
     docker rm -f android_container
     docker rm -f frontend_container
     docker image rm -f android

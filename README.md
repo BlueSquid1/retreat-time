@@ -3,6 +3,7 @@ Retreat time is the app for Yogis that are doing a multi session mediatation. It
 
 # Folder Structure
 frontend - contains the User Interface logic and 95% of the busness logic specific for the Retreat Time app (e.g. how Alarms should be scheduled, what sound should happen with they go off).
+frontend/package.json - this file contains all the typescript libraries and the command to translate the code (typescript and tsx files) into a format that web browsers can understand (javascript and html).
 Android - contains the configuration needed to build a Android app and the remaining 5% of logic that is specific to just Android phones such as registering alarms events with the Android OS.
 build.sh - contains logic so that setting up, building or running the app is a one line command.
 
@@ -11,7 +12,7 @@ The quickest and easiest way to start is to just build and run the frontend via 
 
 If you want intellisense with your local VSCode run this command once `./build.sh setup_dev`
 
-However to build a native binary for Android (also known as a .apk file) you can run `./build.sh all`
+However to build a native binary for Android (also known as a .apk file) you can run `./build.sh all`. The output files for android are placed in `./build/android/`
 
 ## Why Typescript and TSX?
 Web browsers only understand Javascript and HTML files but Typescript and TSX are easier for humans to work with because Typescript allows for variable type hinting and TSX allow for a declarative approach to defining HTML. In other words while this is how you define a variable in Javascript:
@@ -56,7 +57,7 @@ Instead of using React the way it was intended we will stick with the most popul
 - the view is either redrawn not enough (resulting in the view not showing the latest model state) or too often (resulting in the UI being slow).
 - Uncertainty where complex view logic should go. e.g. should you write the complex logic in the controller and then get the view to do basic things or should you keep the logic in the view and then use the controller to orchestrate the view elements.
 
-All these problems are addressed with the MVP architecture. THe majore differences with MVP is we replace the Controller with a Presenter. The Presenter is the same as the Controller however it has one restriction. It can only access the Model and never the View. In other words:
+All these problems are addressed with the MVP architecture. THe major difference with MVP is we replace the Controller with a Presenter. The Presenter is the same as the Controller however it has one restriction. It can only access the Model directly and never the View. In other words:
 
 In a traditional MVC architecture:
 ```
@@ -76,4 +77,4 @@ In a MVP architecture:
 Presenter <---> Model <----> View
 ```
 
-The major benifit of MVP is there is only 1 way for the Presenter to update the view is by updating the model. And the View updates every time the Model updates.
+The major benifit of MVP is it's simplicity. There are only two interfaces (represented as arrows in the "diagrams" above) compared to 3 with MVC. The Presenter calls getter methods from the Model when it needs to retrieve information. The Presenter calls setter methods from the Model when it needs to update the View model. The View calls getter methods from the Model to retrieve information needed for a view. When a variable in the Model changes the view is notified so it can redraw itself so the user can the latest state. Because refreshing the view whenever the model changes is a very common practise it's commonly refered to as Data Binding.

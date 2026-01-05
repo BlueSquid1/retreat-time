@@ -77,4 +77,21 @@ In a MVP architecture:
 Presenter <---> Model <----> View
 ```
 
-The major benifit of MVP is it's simplicity. There are only two interfaces (represented as arrows in the "diagrams" above) compared to 3 with MVC. The Presenter calls getter methods from the Model when it needs to retrieve information. The Presenter calls setter methods from the Model when it needs to update the View model. The View calls getter methods from the Model to retrieve information needed for a view. When a variable in the Model changes the view is notified so it can redraw itself so the user can the latest state. Because refreshing the view whenever the model changes is a very common practise it's commonly refered to as Data Binding.
+The major benifit of MVP is it's simplicity. There are only two interfaces (represented as arrows in the "diagrams" above) compared to 3 with MVC. And in reality this looks like the Model having Getter and Setter methods to get the current state or update the current state. The Presenter and the View can then call these methods when needed.
+
+This simplicity is great however we still have a big problem that hasn't been addressed yet. User Interfaces need to be interactive. But what does that mean? Well, when the state in the Model changes we need to notify the View to refresh itself so the user can see the latest state graphically. Also, the Presenter needs to be notified whenever the state changes in the Model so it can react quickly to user interactions. For example the Presenter might need to validate the a user input field as they are typing it into a form. How do we achieve those of these? There are many solutions however my favourite is sometimes referred to as data binding.
+
+At its core data binding is the Model allowing any other piece of code to subscribe so that it will start recieving future changes that occur. This notification can then be used to refresh the View or for input validation in the Presenter. For example this subscription process might look like the following:
+
+```
+usernameChanged() {
+    console.log("username has changed");
+}
+
+model.username.subscribe(usernameChanged);
+```
+
+Notice how we have subscribed to changes to the username variable in the Model. We pass a function (commonly referred to as the callback function) that is called every time the model.username variable changes. This is the secret to allowing the Presenter and View to react to the model changing.
+
+A more complete version of databinding can be found in the `./Presenter.ts` file. All the logic to implement databinding with React is written in the file `./DatabindingUtils.ts` however it's ok if not everything in this file makes sense to you the first time. Just know that the `useSyncExternalStore()` method is from the React library and it does all the magic to implement a basic data binding approach to any React view.
+

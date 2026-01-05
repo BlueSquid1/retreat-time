@@ -4,7 +4,10 @@ Retreat time is the app for Yogis that are doing a multi session mediatation. It
 # Folder Structure
 frontend - contains the User Interface logic and 95% of the busness logic specific for the Retreat Time app (e.g. how Alarms should be scheduled, what sound should happen with they go off).
 frontend/package.json - this file contains all the typescript libraries and the command to translate the code (typescript and tsx files) into a format that web browsers can understand (javascript and html).
-Android - contains the configuration needed to build a Android app and the remaining 5% of logic that is specific to just Android phones such as registering alarms events with the Android OS.
+frontend/src/index.html - this is the entry point for the web application. Every other source code file is included into this file either dirrectly or through files of files includes.
+frontend/src/App.tsx - this file is responsible for constructing the Presenter, Model and all Views. See rest of README.md for more on Model View Presenter (MVP).
+android - contains the configuration needed to build a Android app and the remaining 5% of logic that is specific to just Android phones such as registering alarms events with the Android OS. Most of the files in this folder have not be modified from a new Android project.
+android/app/src/main/java/com/example/retreattime/MainActivity.kt - The only file that has been significantly modified. It contains the logic to run the rest of the code in the native web browser.
 build.sh - contains logic so that setting up, building or running the app is a one line command.
 
 # Getting started

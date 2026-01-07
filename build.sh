@@ -79,9 +79,6 @@ build_frontend() {
     echo "cleaning from previous frontend build"
     rm -rf "${SCRIPT_DIR}/build/frontend"
 
-    echo "update npm packages"
-    run_quiet npm run --prefix frontend update_packages
-
     echo "build frontend docker image"
     run_quiet docker build --tag "frontend" "${SCRIPT_DIR}/frontend"
     

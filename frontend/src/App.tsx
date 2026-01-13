@@ -1,5 +1,5 @@
 import { NewSessionView } from './views/NewSessionView'
-import { AdvanceSessionView } from './views/AdvanceSessionView'
+import { CurrentSessionView } from './views/CurrentSessionView'
 
 import { AppState, Model } from "./Model"
 import { Presenter } from "./Presenter"
@@ -16,8 +16,8 @@ export function App() {
                 {appState === AppState.newSession && (
                     <NewSessionView model={model} />
                 )}
-                {appState === AppState.AdvanceSession && (
-                    <AdvanceSessionView model={model} />
+                {appState === AppState.currentSession && (
+                    <CurrentSessionView model={model} />
                 )}
             </div>
         </div>

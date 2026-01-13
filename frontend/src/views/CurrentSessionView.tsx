@@ -7,8 +7,9 @@ import { useField } from "../DatabindingUtils";
 
 import { AppState, Model } from "../Model"
 
-export function AdvanceSessionView({ model }: { model: Model }): any {
+export function CurrentSessionView({ model }: { model: Model }): any {
     const [_, setAppState] = useField(model.appState);
+    const [endType, setEndType] = useField(model.endType);
 
     return (
         <div className="card-body">

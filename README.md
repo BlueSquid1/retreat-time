@@ -82,11 +82,12 @@ Presenter <---> Model <----> View
 
 The major benifit of MVP is it's simplicity. There are only two interfaces (represented as arrows in the "diagrams" above) compared to 3 with MVC. And in reality this looks like the Model having Getter and Setter methods to get the current state or update the current state. The Presenter and the View can then call these methods when needed.
 
-This simplicity is great however we still have a big problem that hasn't been addressed yet. User Interfaces need to be interactive. But what does that mean? Well, when the state in the Model changes we need to notify the View to refresh itself so the user can see the latest state graphically. Also, the Presenter needs to be notified whenever the state changes in the Model so it can react quickly to user interactions. For example the Presenter might need to validate the a user input field as they are typing it into a form. How do we achieve those of these? There are many solutions however my favourite is sometimes referred to as data binding.
+This simplicity is great however we still have a big problem that hasn't been addressed yet. User Interfaces need to be interactive. But what does that mean? Well, when the state in the Model changes we need to notify the View to refresh itself so the user can see the latest state graphically. Also, the Presenter needs to be notified whenever the state changes in the Model so it can react quickly to user interactions. For example the Presenter might need to validate a user input field as they are typing it into a form. How do we achieve all of these? There are many solutions however my favourite is sometimes referred to as data binding.
 
 At its core data binding is the Model allowing any other piece of code to subscribe so that it will start recieving future changes that occur. This notification can then be used to refresh the View or for input validation in the Presenter. For example this subscription process might look like the following:
 
 ```
+// in the presenter
 usernameChanged() {
     console.log("username has changed");
 }

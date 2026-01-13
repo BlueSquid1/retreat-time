@@ -9,6 +9,37 @@ if [[ "$*" == *"-v"* ]]; then
     VERBOSE=true
 fi
 
+# generate_container() {
+#     DOCKERFILE_PATH="${1}"
+#     IMAGE_NAME="${2}"
+#     CONTAINER_NAME="${IMAGE_NAME}"
+
+#     # capture the remaining parameters as container arguments
+#     shift 2
+#     CONTAINER_ARGS=$@
+
+#     # Rebuild the image and see if the ID changes. First need current image ID.
+#     OLD_IMAGE_ID="$(docker images -q "${IMAGE_NAME}" 2> /dev/null || true)"
+
+#     docker build ${DOCKER_ARGS}  --tag "${IMAGE_NAME}" "${DOCKERFILE_PATH}"
+#     NEW_IMAGE_ID="$(docker images -q "${IMAGE_NAME}")"
+
+#     # or rebuild if container arguements have changed
+#     OLD_CONTAINER_ARGS=$(docker inspect "${IMAGE_NAME}" | jq -r '.[].Config.Cmd | select(. != null) | join(" ")')
+
+#     if [[ "${OLD_IMAGE_ID}" != "${NEW_IMAGE_ID}" ]] || [[ "${OLD_CONTAINER_ARGS}" != "${CONTAINER_ARGS}" ]]; then
+#         # need to regenerate a new container
+#         echo "docker image has changed or container args have changed. Invalid the any old containers"
+#         docker rm -f "${CONTAINER_NAME}" 2> /dev/null
+#     fi
+
+#     # Create a new container if it doesn't already exist
+#     CONTAINER_EXISTS="$(docker ps -a --filter "name=^/${CONTAINER_NAME}$" --format '{{.ID}}')"
+#     if [[ -z "${CONTAINER_EXISTS}" ]]; then
+#         docker create ${DOCKER_ARGS} --name "${CONTAINER_NAME}" "${IMAGE_NAME}" ${CONTAINER_ARGS}
+#     fi
+# }
+
 run_quiet() {
     local OUTPUT
     OUTPUT=$("$@" 2>&1) || {
@@ -27,17 +58,27 @@ build_android() {
     rm -rf "${SCRIPT_DIR}/build/android"
 
     echo "build android docker image"
+    OLD_IMAGE_ID="$(docker images -q "android" 2> /dev/null || true)"
     # as of 2026, google still do not release the AAPT2 tool (which is part of the android commandline tools) on 
     # linux for the arm64 platform so need to use the amd64 linux image :(
     run_quiet docker build --tag "android" --platform=linux/amd64 "${SCRIPT_DIR}/android"
+    NEW_IMAGE_ID="$(docker images -q "android")"
+
+    if [[ "${OLD_IMAGE_ID}" != "${NEW_IMAGE_ID}" ]]; then
+        echo "docker image has changed. Invalidate any old containers"
+        docker rm -f "android_container" 2> /dev/null
+    fi
 
     echo "compile android app"
-    run_quiet docker run --tty --rm --name "android_container" \
-        --platform=linux/amd64 \
-        -v "${SCRIPT_DIR}/build/frontend:/android/app/src/main/assets" \
-        -v "${SCRIPT_DIR}/build/android:/build/outputs/apk" \
-        android assembleDebug
-    # docker start -a android_container
+    # Create a new container if it doesn't already exist
+    CONTAINER_EXISTS="$(docker ps -a --filter "name=^/android_container$" --format '{{.ID}}')"
+    if [[ -z "${CONTAINER_EXISTS}" ]]; then
+        run_quiet docker run --platform=linux/amd64 --name "android_container" "android" \
+            -v "${SCRIPT_DIR}/android/app/src:/android/app/src:ro" \
+            -v "${SCRIPT_DIR}/build/frontend:/android/app/src/main/assets" \
+            -v "${SCRIPT_DIR}/build/android:/build/outputs/apk" \
+            android assembleDebug
+    fi
 }
 
 run_android() {

@@ -1,5 +1,5 @@
 import { Model, SoundType } from './Model'
-
+import { TimeManager } from './TimeManager';
 
 export class Presenter {
     private model: Model;
@@ -8,12 +8,21 @@ export class Presenter {
         this.model = model;
 
         this.model.startMeditateClicked.subscribe(() => { this.startMeditateClicked() });
+        this.model.durationMins.subscribe(() => { this.recalculateIntervalLengths() })
+    }
+
+    recalculateIntervalLengths() {
+        const newDuration: number = this.model.durationMins.value;
+        const newIntervalOptions: number[] = [];
+        for (let i = 1; i <= Math.floor(newDuration / 2); i++) {
+            newIntervalOptions.push(i);
+        }
+        this.model.intervalLenOptions.value = newIntervalOptions;
     }
 
     startMeditateClicked() {
-        console.log(`interval: ${this.model.intervalMins.value}`);
-        console.log(`alarm type: ${this.model.soundType.value}`);
-        this.model.intervalMins.value = 10;
-        this.model.soundType.value = SoundType.bowl;
+        console.log(`Length: ${this.model.durationMins.value}`);
+        const timeMgr = new TimeManager();
+        timeMgr.scheduleAlarm(this.model.startAt.value);
     }
 }

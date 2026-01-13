@@ -12,6 +12,8 @@ export function NewSessionView({ model }: { model: Model }): any {
     const [startAt, setStartAt] = useField(model.startAt);
     const [durationMins, setDurationMins] = useField(model.durationMins);
     const [soundType, setSoundType] = useField(model.soundType);
+    const [intervalLen, setIntervalLen] = useField(model.intervalLen);
+    const [intervalLenOptions] = useField(model.intervalLenOptions);
 
     function DateToHHMM(date: Date): string {
         return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
@@ -30,15 +32,15 @@ export function NewSessionView({ model }: { model: Model }): any {
 
             {/* Header */}
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h3 className="mb-0">New Session</h3>
-                <button className="btn btn-success">
+                <h3 className="mb-0">New Meditation Session</h3>
+                <button className="btn btn-success" onClick={() => { model.startMeditateClicked.invoke() }}>
                     Start
                 </button>
             </div>
 
             {/* Bell Selection */}
             <div className="mb-3">
-                <label className="form-label">Alarm Sound:</label>
+                <label className="form-label">Alarm sound:</label>
                 <div>
                     {([SoundType.bowl, SoundType.wood, SoundType.bell] as SoundType[]).map(type => (
                         <div className="form-check form-check-inline">
@@ -50,7 +52,7 @@ export function NewSessionView({ model }: { model: Model }): any {
                                 checked={soundType === type}
                                 onChange={() => setSoundType(type)}
                             />
-                            <label className="btn btn-secondary" htmlFor={`bell-${type}`}>
+                            <label className="btn btn-primary" htmlFor={`bell-${type}`}>
                                 {type}
                             </label>
                         </div>
@@ -74,7 +76,7 @@ export function NewSessionView({ model }: { model: Model }): any {
 
             {/* Length */}
             <div className="mb-3">
-                <label className="form-label">Length:</label>
+                <label className="form-label">Total Duration (mins):</label>
                 <input
                     type="number"
                     min="1"
@@ -85,14 +87,22 @@ export function NewSessionView({ model }: { model: Model }): any {
                 />
             </div>
 
-            {/* Repeat */}
+            {/* Intervals */}
             <div className="mb-3">
-                <button
-                    className="btn btn-primary w-100"
-                    onClick={() => { setAppState(AppState.AdvanceSession) }}
+                <label htmlFor="sessionType" className="form-label">Intervals:</label>
+
+                <select
+                    id="sessionType"
+                    className="form-select"
+                    value={intervalLen}
+                    onChange={(e) => setIntervalLen(Number(e.target.value))}
                 >
-                    Repeat?
-                </button>
+                    <option value="0">No Intervals</option>
+
+                    {intervalLenOptions.map((option) => (
+                        <option value={option}>{option} min intervals</option>
+                    ))}
+                </select>
             </div>
         </div>
     );

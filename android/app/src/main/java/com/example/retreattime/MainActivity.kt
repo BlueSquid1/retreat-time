@@ -27,52 +27,56 @@ import androidx.webkit.WebViewAssetLoader
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import android.util.Log
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
 
-// class WebAppInterface(private val context: Context, private val androidAlarmService: AndroidAlertService) {
-//     @JavascriptInterface
-//     fun scheduleAlarm() {
-//         val alarmId: Int = 0;
-//         val triggerTimeMillis: Long = System.currentTimeMillis() + 5000;
-//         Toast.makeText(this.context, "Scheduled alarm", Toast.LENGTH_SHORT).show();
-//         //this.androidAlarmService.setAlarm(alarmId, triggerTimeMillis);
-//     }
-// }
+class WebAppInterface(private val context: Context, private val androidAlarmService: AndroidAlertService) {
+    @JavascriptInterface
+    fun scheduleAlarm() {
+        val alarmId: Int = 0;
+        val triggerTimeMillis: Long = System.currentTimeMillis() + 5000;
+        Log.d("MyActivityTag", "scheduled alarm");
+        //Toast.makeText(this.context, "Scheduled alarm", Toast.LENGTH_SHORT).show();
+        this.androidAlarmService.setAlarm(alarmId, triggerTimeMillis);
+    }
+}
 
 class MainActivity : ComponentActivity() {
-    private val androidAlarmService = AndroidAlertService(this);
+    private var androidAlarmService: AndroidAlertService? = null;
 
     override fun onResume() {
         super.onResume()
-        // if (!this.androidAlarmService.hasNotificationPermission()) {
-        //     AlertDialog.Builder(this)
-        //         .setTitle("Alarm Permission Needed")
-        //         .setMessage("In order to have accurate timing please enable exact alarm.")
-        //         .setPositiveButton("OK") { _, _ ->
-        //             val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-        //             startActivity(intent)
-        //         }
-        //         .setNegativeButton("Cancel", null)
-        //         .create()
-        //         .show()
-        // }
+        if (!this.androidAlarmService!!.hasNotificationPermission()) {
+            AlertDialog.Builder(this)
+                .setTitle("Alarm Permission Needed")
+                .setMessage("In order to have accurate timing please enable exact alarm.")
+                .setPositiveButton("OK") { _, _ ->
+                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                    startActivity(intent)
+                }
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show()
+        }
 
-        // if (!this.androidAlarmService.hasExactTimePermission()) {
-        //     AlertDialog.Builder(this)
-        //         .setTitle("Notification Permission Needed")
-        //         .setMessage("Without notifications alarms will be silenced")
-        //         .setPositiveButton("OK") { _, _ ->
-        //             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 100)
-        //         }
-        //         .setNegativeButton("Cancel", null)
-        //         .create()
-        //         .show()
-        // }
+        if (!this.androidAlarmService!!.hasExactTimePermission()) {
+            AlertDialog.Builder(this)
+                .setTitle("Notification Permission Needed")
+                .setMessage("Without notifications alarms will be silenced")
+                .setPositiveButton("OK") { _, _ ->
+                    requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 100)
+                }
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState);
+
+        this.androidAlarmService = AndroidAlertService(this);
         enableEdgeToEdge();
 
         // Web client
@@ -95,8 +99,8 @@ class MainActivity : ComponentActivity() {
         // Enable the Javascript interpreter in the web browser
         webView.settings.javaScriptEnabled = true;
 
-        //val jsWebInterface = WebAppInterface(this, this.androidAlarmService);
-        //webView.addJavascriptInterface(jsWebInterface, "Android");
+        val jsWebInterface = WebAppInterface(this, this.androidAlarmService!!);
+        webView.addJavascriptInterface(jsWebInterface, "Android");
 
         // Load local HTML file using asset loader
         webView.loadUrl("https://appassets.androidplatform.net/assets/index.html");

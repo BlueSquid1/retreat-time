@@ -95,7 +95,7 @@ class AndroidAlertService(private val context: ComponentActivity) {
     private val alarmManager: AlarmManager =
         this.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager;
 
-    public fun hasNotificationPermission(): Boolean {
+    fun hasNotificationPermission(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (this.context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 return false;
@@ -104,7 +104,7 @@ class AndroidAlertService(private val context: ComponentActivity) {
         return true;
     }
 
-    public fun hasExactTimePermission(): Boolean {
+    fun hasExactTimePermission(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (!this.alarmManager.canScheduleExactAlarms()) {
                 return false;
@@ -113,7 +113,7 @@ class AndroidAlertService(private val context: ComponentActivity) {
         return true;
     }
 
-    public fun setAlarm(alarmId: Int, triggerAtUtcTimeMillis: Long) {
+    fun setAlarm(alarmId: Int, triggerAtUtcTimeMillis: Long) {
         val intent = Intent(this.context, AlarmReceiver::class.java)
             .putExtra("ALARM_ID", alarmId)
 

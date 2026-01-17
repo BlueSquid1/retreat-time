@@ -33,11 +33,10 @@ import android.widget.FrameLayout
 
 class WebAppInterface(private val context: Context, private val androidAlarmService: AndroidAlertService) {
     @JavascriptInterface
-    fun scheduleAlarm() {
+    fun scheduleAlarms(alarmsJson: String) {
+        Log.d("MyActivityTag", "alarmsJson is: $alarmsJson");
         val alarmId: Int = 0;
         val triggerTimeMillis: Long = System.currentTimeMillis() + 5000;
-        Log.d("MyActivityTag", "scheduled alarm");
-        //Toast.makeText(this.context, "Scheduled alarm", Toast.LENGTH_SHORT).show();
         this.androidAlarmService.setAlarm(alarmId, triggerTimeMillis);
     }
 }
@@ -47,20 +46,20 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (!this.androidAlarmService!!.hasNotificationPermission()) {
+        if (!this.androidAlarmService!!.hasExactTimePermission()) {
             AlertDialog.Builder(this)
                 .setTitle("Alarm Permission Needed")
                 .setMessage("In order to have accurate timing please enable exact alarm.")
                 .setPositiveButton("OK") { _, _ ->
-                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                    startActivity(intent)
+                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                    startActivity(intent);
                 }
                 .setNegativeButton("Cancel", null)
                 .create()
                 .show()
         }
 
-        if (!this.androidAlarmService!!.hasExactTimePermission()) {
+        if (!this.androidAlarmService!!.hasNotificationPermission()) {
             AlertDialog.Builder(this)
                 .setTitle("Notification Permission Needed")
                 .setMessage("Without notifications alarms will be silenced")

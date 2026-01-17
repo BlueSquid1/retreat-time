@@ -1,5 +1,5 @@
 import { Model, SoundType } from './Model'
-import { TimeManager } from './TimeManager';
+import { AlarmService, AlarmDetail } from './services/AlarmService';
 
 export class Presenter {
     private model: Model;
@@ -20,9 +20,51 @@ export class Presenter {
         this.model.intervalLenOptions.value = newIntervalOptions;
     }
 
+    isSameDay(timeStamp: Date, now: Date): boolean {
+        if (timeStamp.getHours() > now.getHours()) {
+            return true;
+        } else if (timeStamp.getHours() < now.getHours()) {
+            return false;
+        } else {
+            // Look at the minutes when in the same hour
+            return (timeStamp.getMinutes() > now.getMinutes());
+        }
+    }
+
+    convertFromHhmmToEpoch(hhmmDate: Date, now: Date): Date {
+        let epochDate: Date = new Date(now);
+        if (!this.isSameDay(hhmmDate, now)) {
+            // Next day - start at midnight
+            epochDate.setDate(now.getDate() + 1);
+            epochDate.setHours(0, 0, 0, 0);
+        }
+
+        epochDate.setHours(hhmmDate.getHours(), hhmmDate.getMinutes(), 0, 0);
+        return epochDate;
+    }
+
     startMeditateClicked() {
-        console.log(`Length: ${this.model.durationMins.value}`);
-        const timeMgr = new TimeManager();
-        timeMgr.scheduleAlarm(this.model.startAt.value);
+        let alarmsDetails: AlarmDetail[] = [];
+
+        const now = new Date();
+
+        // Calculate interval alarms
+        if (this.model.intervalLen.value > 0) {
+            // TODO
+        }
+
+        // Calculate final alarm
+        let finalAlarm = new AlarmDetail();
+
+        // Convert from hh:mm to epoch time stamps
+        const hhmmDate = this.model.startAt.value;
+        finalAlarm.triggerAtEpoch = this.convertFromHhmmToEpoch(hhmmDate, now).getTime();
+        finalAlarm.sound = this.model.soundType.value;
+
+        alarmsDetails.push(finalAlarm);
+
+
+        const alarmService = new AlarmService();
+        alarmService.scheduleAlarms(alarmsDetails);
     }
 }

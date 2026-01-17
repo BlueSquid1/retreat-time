@@ -12,15 +12,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioAttributes
-import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.core.app.NotificationCompat
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        Log.d("MyActivityTag", "alarm triggered now");
         // Called when the alarm time has occurred
         // Toast.makeText(context, "alarm triggered now", Toast.LENGTH_LONG).show()
 
@@ -35,17 +36,15 @@ class AlarmReceiver : BroadcastReceiver() {
 }
 
 class AlarmService : Service() {
-    // Code that runs in the foreground
-    private lateinit var mediaPlayer: MediaPlayer
-
-    override fun onCreate() {
-        super.onCreate()
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId);
         // Play alarm sound in a notification
         val notificationId = 1
         startForeground(
             notificationId,
-            createNotification()
+            this.createNotification()
         )
+        return START_NOT_STICKY;
     }
 
     private fun createNotification(): Notification {
@@ -80,12 +79,6 @@ class AlarmService : Service() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setOngoing(false)
             .build()
-    }
-
-    override fun onDestroy() {
-        mediaPlayer.stop()
-        mediaPlayer.release()
-        super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null

@@ -15,11 +15,14 @@ export function NewSessionView({ model }: { model: Model }): any {
     const [intervalLen, setIntervalLen] = useField(model.intervalLen);
     const [intervalLenOptions] = useField(model.intervalLenOptions);
 
-    function DateToHHMM(date: Date): string {
-        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
+    function DateToHHMM(date: Date | null): string {
+        if (date === null) {
+            return "";
+        }
+        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
     }
 
-    function HHMMToDate(time: string): Date {
+    function HHMMToDate(time: string): Date | null {
         const [hours, minutes] = time.split(':').map(Number);
         const date = new Date(0);
         date.setHours(hours);

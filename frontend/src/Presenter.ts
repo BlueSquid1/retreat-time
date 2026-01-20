@@ -8,7 +8,7 @@ export class Presenter {
         this.model = model;
 
         this.model.startMeditateClicked.subscribe(() => { this.startMeditateClicked() });
-        this.model.durationMins.subscribe(() => { this.recalculateIntervalLengths() })
+        this.model.durationMins.subscribe(() => { this.recalculateIntervalLengths() });
     }
 
     recalculateIntervalLengths() {
@@ -31,7 +31,7 @@ export class Presenter {
         }
     }
 
-    convertFromHhmmToEpoch(hhmmDate: Date, now: Date): Date {
+    fromHhmmToEpochDate(hhmmDate: Date, now: Date): Date {
         let epochDate: Date = new Date(now);
         if (!this.isSameDay(hhmmDate, now)) {
             // Next day - start at midnight
@@ -44,23 +44,36 @@ export class Presenter {
     }
 
     startMeditateClicked() {
-        let alarmsDetails: AlarmDetail[] = [];
-
+        // Get time now
         const now = new Date();
 
+        // Convert from hh:mm to epoch time stamps
+        let startEpochMilliSec = new Date().getTime();
+        const hhmmDate: Date | null = this.model.startAt.value;
+        if (hhmmDate !== null) {
+            startEpochMilliSec = this.fromHhmmToEpochDate(hhmmDate, now).getTime();
+        }
+
+        let alarmsDetails: AlarmDetail[] = [];
+
         // Calculate interval alarms
+        const totalDurationMilliSec = this.model.durationMins.value * 60 * 1000;
+        const endEpochMilliSec = startEpochMilliSec + totalDurationMilliSec;
         if (this.model.intervalLen.value > 0) {
-            // TODO
+            let intervalEpoch = startEpochMilliSec;
+            while (intervalEpoch < endEpochMilliSec) {
+                let intervalAlarm = new AlarmDetail();
+                intervalAlarm.triggerAtEpoch = intervalEpoch;
+                intervalAlarm.sound = this.model.soundType.value;
+                alarmsDetails.push(intervalAlarm);
+                intervalEpoch += (this.model.intervalLen.value * 1000);
+            }
         }
 
         // Calculate final alarm
         let finalAlarm = new AlarmDetail();
-
-        // Convert from hh:mm to epoch time stamps
-        const hhmmDate = this.model.startAt.value;
-        finalAlarm.triggerAtEpoch = this.convertFromHhmmToEpoch(hhmmDate, now).getTime();
+        finalAlarm.triggerAtEpoch = endEpochMilliSec;
         finalAlarm.sound = this.model.soundType.value;
-
         alarmsDetails.push(finalAlarm);
 
 

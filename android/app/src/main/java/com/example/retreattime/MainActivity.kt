@@ -1,6 +1,5 @@
 package com.example.retreattime
 
-import android.Manifest
 import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.Notification
@@ -11,32 +10,40 @@ import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import android.Manifest
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
+import android.util.Log
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.webkit.WebViewAssetLoader
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import android.util.Log
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.widget.FrameLayout
+import androidx.webkit.WebViewAssetLoader
+import org.json.JSONArray
 
 class WebAppInterface(private val context: Context, private val androidAlarmService: AndroidAlertService) {
     @JavascriptInterface
     fun scheduleAlarms(alarmsJson: String) {
-        Log.d("MyActivityTag", "alarmsJson is: $alarmsJson");
+        Log.d("MyActivityTag", "json: $alarmsJson");
+        val x = JSONArray(alarmsJson);
+        val len = x.length();
+        Log.d("MyActivityTag", "json len: $len");
+        val alarm = x.getJSONObject(0);
+        val sound = alarm.getString("sound");
         val alarmId: Int = 0;
-        val triggerTimeMillis: Long = System.currentTimeMillis() + 5000;
+        val triggerTimeMillis: Long = alarm.getLong("triggerAtEpoch");
+        Log.d("MyActivityTag", "triggering at : $triggerTimeMillis");
         this.androidAlarmService.setAlarm(alarmId, triggerTimeMillis);
     }
 }

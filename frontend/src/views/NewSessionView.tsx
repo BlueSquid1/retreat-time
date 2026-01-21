@@ -5,7 +5,7 @@ import "bootstrap";
 
 import { useField } from "../DatabindingUtils";
 
-import { AppState, Model, SoundType } from "../Model"
+import { Model, SoundType } from "../Model"
 
 export function NewSessionView({ model }: { model: Model }): any {
     const [_, setAppState] = useField(model.appState);

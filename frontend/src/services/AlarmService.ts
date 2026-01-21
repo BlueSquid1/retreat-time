@@ -1,9 +1,5 @@
-import { SoundType } from '../Model'
+import { AlarmDetail } from '../Model'
 
-export class AlarmDetail {
-    triggerAtEpoch: number = 0;
-    sound: SoundType = SoundType.bowl;
-}
 
 declare const Android: {
     scheduleAlarms: (jsonString: string) => void;

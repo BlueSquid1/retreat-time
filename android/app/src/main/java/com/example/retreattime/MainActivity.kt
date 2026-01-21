@@ -36,15 +36,17 @@ class WebAppInterface(private val context: Context, private val androidAlarmServ
     @JavascriptInterface
     fun scheduleAlarms(alarmsJson: String) {
         Log.d("MyActivityTag", "json: $alarmsJson");
-        val x = JSONArray(alarmsJson);
-        val len = x.length();
+        val alarms = JSONArray(alarmsJson);
+        val len = alarms.length();
         Log.d("MyActivityTag", "json len: $len");
-        val alarm = x.getJSONObject(0);
-        val sound = alarm.getString("sound");
-        val alarmId: Int = 0;
-        val triggerTimeMillis: Long = alarm.getLong("triggerAtEpoch");
-        Log.d("MyActivityTag", "triggering at : $triggerTimeMillis");
-        this.androidAlarmService.setAlarm(alarmId, triggerTimeMillis);
+        for (i in 0 until len) {
+            val alarm = alarms.getJSONObject(i);
+            val soundType = alarm.getString("sound");
+            val alarmId: Int = i;
+            val triggerTimeMillis: Long = alarm.getLong("triggerAtEpoch");
+            Log.d("MyActivityTag", "triggering at : $triggerTimeMillis");
+            this.androidAlarmService.setAlarm(alarmId, triggerTimeMillis, soundType);
+        }
     }
 }
 

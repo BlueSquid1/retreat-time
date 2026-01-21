@@ -21,16 +21,19 @@ import androidx.core.app.NotificationCompat
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d("MyActivityTag", "alarm triggered now");
-        // Called when the alarm time has occurred
-        // Toast.makeText(context, "alarm triggered now", Toast.LENGTH_LONG).show()
+        val alarmId = intent.getIntExtra("ALARM_ID", 0);
+        val soundType = intent.getStringExtra("SOUND_TYPE");
+        Log.d("MyActivityTag", "alarm triggered now for id: ${alarmId} with sound: ${soundType}");
 
         // Need to move to a service to do more useful things
-        val intent = Intent(context, AlarmService::class.java);
+        val intentForAlarmService = Intent(context, AlarmService::class.java)
+            .putExtra("ALARM_ID", alarmId)
+            .putExtra("SOUND_TYPE", soundType)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent)
+            context.startForegroundService(intentForAlarmService)
         } else {
-            context.startService(intent)
+            context.startService(intentForAlarmService)
         }
     }
 }
@@ -39,26 +42,34 @@ class AlarmService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId);
         // Play alarm sound in a notification
-        val notificationId = 1
+        Log.d("MyActivityTag", "starting forground service");
+        val alarmId = intent!!.getIntExtra("ALARM_ID", 0);
+        Log.d("MyActivityTag", "alarm ID: ${alarmId}");
+        val soundType: String? = intent!!.getStringExtra("SOUND_TYPE");
+        Log.d("MyActivityTag", "soundType: ${soundType}");
+
+        // Notification ID can't be zero so just add 1 to the alarm ID
+        val notificationId = alarmId + 1;
         startForeground(
             notificationId,
-            this.createNotification()
+            this.createNotification(soundType!!)
         )
         return START_NOT_STICKY;
     }
 
-    private fun createNotification(): Notification {
-        val channelId = "alarm_channel"
+    private fun createNotification(soundType: String): Notification {
+        val channelId = "${soundType}_alarm_channel"
 
         val soundUri = Uri.parse(
-            "android.resource://${this.packageName}/raw/bell"
+            "android.resource://${this.packageName}/raw/${soundType}"
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Tell Android a high importance notification is about to come
+            Log.d("MyActivityTag", "registering a notification channel");
+            // Register a notification channel
             val channel = NotificationChannel(
                 channelId,
-                "alarms",
+                "${soundType} alarms",
                 NotificationManager.IMPORTANCE_HIGH
             )
 
@@ -71,6 +82,8 @@ class AlarmService : Service() {
             this.getSystemService(NotificationManager::class.java)
                 .createNotificationChannel(channel)
         }
+
+        Log.d("MyActivityTag", "creating a notification for ${channelId}");
 
         return NotificationCompat.Builder(this, channelId)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
@@ -106,9 +119,10 @@ class AndroidAlertService(private val context: ComponentActivity) {
         return true;
     }
 
-    fun setAlarm(alarmId: Int, triggerAtUtcTimeMillis: Long) {
+    fun setAlarm(alarmId: Int, triggerAtUtcTimeMillis: Long, soundType: String) {
         val intent = Intent(this.context, AlarmReceiver::class.java)
             .putExtra("ALARM_ID", alarmId)
+            .putExtra("SOUND_TYPE", soundType)
 
         val pendingIntent = PendingIntent.getBroadcast(
             this.context,

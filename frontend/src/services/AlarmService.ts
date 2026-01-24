@@ -11,4 +11,8 @@ export class AlarmService {
         Android.scheduleAlarms(jsonString);
         return true;
     }
+
+    cancelPendingAlarms(alarmsDetails: AlarmDetail[]): boolean {
+        return true;
+    }
 }

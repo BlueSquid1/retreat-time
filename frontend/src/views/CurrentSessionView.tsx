@@ -8,8 +8,9 @@ import { useField } from "../DatabindingUtils";
 import { AppState, Model } from "../Model"
 
 export function CurrentSessionView({ model }: { model: Model }): any {
-    const [_, setAppState] = useField(model.appState);
-    const [endType, setEndType] = useField(model.endType);
+    const [timeToNextAlarm] = useField(model.timeToAlarmMin);
+    const [remainingAlarms] = useField(model.remainingAlarms);
+
 
     return (
         <div className="card-body">
@@ -18,52 +19,25 @@ export function CurrentSessionView({ model }: { model: Model }): any {
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <button
                     className="btn btn-primary"
-                    onClick={() => { setAppState(AppState.newSession) }}
+                    onClick={() => { model.cancelMeditateClicked.invoke() }}
                 >
-                    Back
+                    Cancel
                 </button>
-                <h3 className="mb-0">Advance Settings</h3>
+                <h3 className="mb-0">Current Session</h3>
             </div>
 
-            {/* End */}
-            <div className="mb-3">
-                <label className="form-label">End</label>
-                <select
-                    className="form-select"
-                // value={endType}
-                // onChange={e => setEndType(e.target.value as EndType)}
-                >
-                    <option value="occurrences">After number of occurrences</option>
-                    <option value="time">At end time</option>
-                </select>
+            {/* Time to next alarm */}
+            <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: '200px' }}>
+                <div className="text-center mb-4">
+                    <p className="mb-2">Time to next alarm:</p>
+                    <h1 className="display-4">{timeToNextAlarm} mins</h1>
+                </div>
+
+                {/* Alarms remaining */}
+                <div className="text-center">
+                    <p className="mb-0">{remainingAlarms} alarms remaining</p>
+                </div>
             </div>
-
-            {/* Occurrences */}
-            {'occurrences' === 'occurrences' && (
-                <div className="mb-3">
-                    <label className="form-label">Occurrences</label>
-                    <input
-                        type="number"
-                        min={1}
-                        className="form-control"
-                        value="5"
-                    // onChange={e => setOccurrences(Number(e.target.value))}
-                    />
-                </div>
-            )}
-
-            {/* End Time */}
-            {/* {endType === 'time' && (
-                <div className="mb-3">
-                    <label className="form-label">End time</label>
-                    <input
-                        type="time"
-                        className="form-control"
-                        value={endTime}
-                        onChange={e => setEndTime(e.target.value)}
-                    />
-                </div>
-            )} */}
         </div>
     );
 }

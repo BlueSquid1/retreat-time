@@ -20,6 +20,7 @@ export enum EndType {
 }
 
 export class AlarmDetail {
+    id: number = 0;
     triggerAtEpoch: number = 0;
     sound: SoundType = SoundType.bowl;
 }
@@ -32,8 +33,12 @@ export class Model {
     public durationMins: ObservableField<number> = new ObservableField<number>(30);
     public intervalLen: ObservableField<number> = new ObservableField<number>(0);
     public intervalLenOptions: ObservableField<number[]> = new ObservableField<number[]>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
-    public startMeditateClicked: Event = new Event();
     public startedSessionAt: ObservableField<Date | null> = new ObservableField<Date | null>(null);
+    public startMeditateClicked: Event = new Event();
+    public cancelMeditateClicked: Event = new Event();
+    public timeToAlarmMin: ObservableField<number> = new ObservableField<number>(0);
+    public remainingAlarms: ObservableField<number> = new ObservableField<number>(0);
+
 
     isSameDay(timeStamp: Date, now: Date): boolean {
         if (timeStamp.getHours() > now.getHours()) {
@@ -58,20 +63,20 @@ export class Model {
         return epochDate;
     }
 
-    getUpcomingAlarms(): AlarmDetail[] {
-        const startSessionAt = this.startedSessionAt.value;
-        if (startSessionAt === null) {
+    getAllAlarms(): AlarmDetail[] {
+        if (this.startedSessionAt.value == null) {
             return [];
         }
 
         // Convert from hh:mm to epoch time stamps
-        let startEpochMilliSec = new Date().getTime();
+        let startEpochMilliSec = this.startedSessionAt.value.getTime();
         const hhmmDate: Date | null = this.startAt.value;
         if (hhmmDate !== null) {
-            startEpochMilliSec = this.fromHhmmToEpochDate(hhmmDate, startSessionAt).getTime();
+            startEpochMilliSec = this.fromHhmmToEpochDate(hhmmDate, this.startedSessionAt.value).getTime();
         }
 
         let alarmsDetails: AlarmDetail[] = [];
+        let nextUniqueId = 0;
 
         // Calculate interval alarms
         const totalDurationMilliSec = this.durationMins.value * 60 * 1000;
@@ -81,6 +86,8 @@ export class Model {
             let intervalEpoch = startEpochMilliSec + intervalLenMilliSec;
             while (intervalEpoch < endEpochMilliSec) {
                 let intervalAlarm = new AlarmDetail();
+                intervalAlarm.id = nextUniqueId;
+                nextUniqueId++;
                 intervalAlarm.triggerAtEpoch = intervalEpoch;
                 intervalAlarm.sound = this.soundType.value;
                 alarmsDetails.push(intervalAlarm);
@@ -94,5 +101,16 @@ export class Model {
         finalAlarm.sound = this.soundType.value;
         alarmsDetails.push(finalAlarm);
         return alarmsDetails;
+    }
+
+    getUpcomingAlarms(currentTime: Date): AlarmDetail[] {
+        const allAlarms = this.getAllAlarms();
+        let upcomingAlarms: AlarmDetail[] = [];
+        for (const alarm of allAlarms) {
+            if (alarm.triggerAtEpoch >= currentTime.getTime()) {
+                upcomingAlarms.push(alarm);
+            }
+        }
+        return upcomingAlarms;
     }
 }

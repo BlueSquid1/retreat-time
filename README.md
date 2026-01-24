@@ -1,6 +1,10 @@
 # Retreat Time
 Retreat time is the app for Yogis that are doing a multi session mediatation. It is like the clock app but tailored for people that are doing a full day of mediatation and don't want the distraction of needing to check their phone to see the time.
 
+# TODO
+- make presenter trigger time update once per minute
+- cancel pending alarms in Android
+
 # Folder Structure
 frontend - contains the User Interface logic and 95% of the busness logic specific for the Retreat Time app (e.g. how Alarms should be scheduled, what sound should happen with they go off).
 frontend/package.json - this file contains all the typescript libraries and the command to translate the code (typescript and tsx files) into a format that web browsers can understand (javascript and html).

@@ -8,7 +8,6 @@ import { useField } from "../DatabindingUtils";
 import { Model, SoundType } from "../Model"
 
 export function NewSessionView({ model }: { model: Model }): any {
-    const [_, setAppState] = useField(model.appState);
     const [startAt, setStartAt] = useField(model.startAt);
     const [durationMins, setDurationMins] = useField(model.durationMins);
     const [soundType, setSoundType] = useField(model.soundType);

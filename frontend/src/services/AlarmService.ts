@@ -2,7 +2,8 @@ import { AlarmDetail } from '../Model'
 
 
 declare const Android: {
-    scheduleAlarms: (jsonString: string) => void;
+    scheduleAlarms: (jsonString: string) => boolean;
+    cancelAlarms: (jsonString: string) => boolean;
 };
 
 export class AlarmService {
@@ -13,6 +14,8 @@ export class AlarmService {
     }
 
     cancelPendingAlarms(alarmsDetails: AlarmDetail[]): boolean {
+        const jsonString = JSON.stringify(alarmsDetails);
+        Android.cancelAlarms(jsonString);
         return true;
     }
 }

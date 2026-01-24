@@ -21,7 +21,7 @@ export function CurrentSessionView({ model }: { model: Model }): any {
                     className="btn btn-primary"
                     onClick={() => { model.cancelMeditateClicked.invoke() }}
                 >
-                    Cancel
+                    Back
                 </button>
                 <h3 className="mb-0">Current Session</h3>
             </div>

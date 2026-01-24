@@ -137,4 +137,19 @@ class AndroidAlertService(private val context: ComponentActivity) {
             pendingIntent
         )
     }
+
+    fun cancelAlarm(alarmId: Int, triggerAtUtcTimeMillis: Long, soundType: String) {
+        val intent = Intent(this.context, AlarmReceiver::class.java)
+            .putExtra("ALARM_ID", alarmId)
+            .putExtra("SOUND_TYPE", soundType)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            this.context,
+            alarmId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        this.alarmManager.cancel(pendingIntent);
+        pendingIntent.cancel();
+    }
 }

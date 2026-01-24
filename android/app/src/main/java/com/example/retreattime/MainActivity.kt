@@ -48,6 +48,21 @@ class WebAppInterface(private val context: Context, private val androidAlarmServ
             this.androidAlarmService.setAlarm(alarmId, triggerTimeMillis, soundType);
         }
     }
+
+    @JavascriptInterface
+    fun cancelAlarms(alarmsJson: String) {
+        Log.d("MyActivityTag", "json: $alarmsJson");
+        val alarms = JSONArray(alarmsJson);
+        val len = alarms.length();
+        Log.d("MyActivityTag", "json len: $len");
+        for (i in 0 until len) {
+            val alarm = alarms.getJSONObject(i);
+            val soundType = alarm.getString("sound");
+            val alarmId: Int = i;
+            val triggerTimeMillis: Long = alarm.getLong("triggerAtEpoch");
+            this.androidAlarmService.cancelAlarm(alarmId, triggerTimeMillis, soundType);
+        }
+    }
 }
 
 class MainActivity : ComponentActivity() {

@@ -14,7 +14,7 @@ export class Presenter {
         this.model.cancelMeditateClicked.subscribe(() => { this.cancelMeditationClicked() });
         this.model.durationMins.subscribe(() => { this.recalculateIntervalLengths() });
 
-        // Set up recurring function call every 1 minute to recalculate remaining time
+        // Set up recurring function call every 1 second to recalculate remaining time
         setInterval(() => {
             this.recalculateTimers();
         }, 1000);
@@ -43,8 +43,9 @@ export class Presenter {
     }
 
     cancelMeditationClicked() {
-        let alarmDetails = this.model.getAllAlarms();
-        this.alarmService.cancelPendingAlarms(alarmDetails);
+        let pendingAlarms = this.model.getUpcomingAlarms(new Date());
+        this.alarmService.cancelPendingAlarms(pendingAlarms);
+        this.model.startAt.value = null;
         this.model.appState.value = AppState.newSession;
     }
 
@@ -62,6 +63,4 @@ export class Presenter {
         this.model.timeToAlarmMin.value = timeToAlarmMin;
         this.model.remainingAlarms.value = upcomingAlarms.length - 1;
     }
-
-
 }
